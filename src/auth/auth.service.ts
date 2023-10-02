@@ -9,6 +9,8 @@ import { Model } from 'mongoose';
 import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './interfaces/jwt.payload';
+import { LoginResponse } from './interfaces/login-response';
+import { RegisterDto } from './dto/register-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,8 +39,16 @@ export class AuthService {
 		}
 	}
 
+	async register(registerDto: RegisterDto): Promise<LoginResponse> {
 
-	async login(loginDto: LoginDto) {
+		const user = await this.create(registerDto);
+		return {
+			user,
+			token: this.getJwtToken({ id: user._id })
+		}
+	}
+
+	async login(loginDto: LoginDto): Promise<LoginResponse> {
 
 		const { email, password } = loginDto;
 		const user = await this.userModel.findOne({ email: email });
